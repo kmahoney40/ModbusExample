@@ -1,0 +1,8 @@
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus_Example2.Form1.resources
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus_Example2.Properties.Resources.resources
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus Example2.csproj.GenerateResource.Cache
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\bin\Debug\Modbus Example2.exe
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\bin\Debug\Modbus Example2.pdb
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus Example2.exe
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus Example2.pdb
+D:\Source\Velocio\Modbus Example vs2010\Modbus Example2\obj\x86\Debug\Modbus Example2.csprojResolveAssemblyReference.cache
