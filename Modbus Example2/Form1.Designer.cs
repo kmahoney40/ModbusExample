@@ -57,6 +57,7 @@
             this.writeFloat = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
             this.read32Value = new System.Windows.Forms.TextBox();
+            this.readFloat = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.write16Value)).BeginInit();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.write32Value)).BeginInit();
@@ -339,11 +340,22 @@
             this.read32Value.Size = new System.Drawing.Size(100, 20);
             this.read32Value.TabIndex = 28;
             // 
+            // readFloat
+            // 
+            this.readFloat.Location = new System.Drawing.Point(838, 138);
+            this.readFloat.Name = "readFloat";
+            this.readFloat.Size = new System.Drawing.Size(75, 23);
+            this.readFloat.TabIndex = 29;
+            this.readFloat.Text = "Read";
+            this.readFloat.UseVisualStyleBackColor = true;
+            this.readFloat.Click += new System.EventHandler(this.readFloat_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1096, 426);
+            this.Controls.Add(this.readFloat);
             this.Controls.Add(this.read32Value);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.writeFloat);
@@ -416,6 +428,7 @@
         private System.Windows.Forms.Button writeFloat;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox read32Value;
+        private System.Windows.Forms.Button readFloat;
     }
 }
 
