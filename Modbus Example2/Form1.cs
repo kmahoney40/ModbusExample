@@ -284,6 +284,11 @@ namespace Modbus_Example2
                     bCRCPasses = true;  // In this example, we're not doing anything with this result, but you could make sure it passes before using the data
 
 
+                /*
+                 * Add an xml or JSON file to declare addresses and data types
+                 * */
+
+
                 MessageRecieved.Text = sMessageRecieved;
                 switch (readVal[1])
                 {
@@ -302,23 +307,20 @@ namespace Modbus_Example2
                     case 0x04: // (Modbus Read Input Registers)
 
                         byte[] myFloatArray = new byte[4];
-                        myFloatArray[0] = (byte)0;
-                        myFloatArray[1] = (byte)0;
-                        myFloatArray[2] = (byte)112;
-                        myFloatArray[3] = (byte)65;
                         float myFloat = System.BitConverter.ToSingle(myFloatArray, 0);
                         myFloatArray[2] = readVal[4];
                         myFloatArray[3] = readVal[3];
                         myFloatArray[0] = readVal[6];
                         myFloatArray[1] = readVal[5];
                         myFloat = System.BitConverter.ToSingle(myFloatArray, 0);
+                        read32FloatValue.Text = myFloat.ToString();
 
 
                         iMessageLength = readVal[2]; // Byte Count (# of data bytes)
                         UInt32 val1 = (UInt32)(readVal[4] + readVal[3] * 0x100) * 65536;
                         UInt32 val2 = (UInt32)(readVal[6] + readVal[5] * 0x100);
                         UInt32 valToDisplay = val1 + val2;
-                        read32Value.Text = valToDisplay.ToString(); 
+                         read32Value.Text = valToDisplay.ToString(); 
                         break;
                     //case 0x04: // (Modbus Read Input Registers)
                     //     byte[] myI32Array = new byte[4];
@@ -447,10 +449,6 @@ namespace Modbus_Example2
             Byte[] myFloatBytes = new Byte[4];
             myFloatBytes = BitConverter.GetBytes(fValue);
 
-            //alReturn.Add(myFloatBytes[1]); // Quantity of Outputs Hi of Least Significant Word
-            //alReturn.Add(myFloatBytes[0]); // Quantity of Outputs Lo of Least Significant Word
-            //alReturn.Add(myFloatBytes[3]); // Quantity of Outputs Hi of Most Significant Word
-            //alReturn.Add(myFloatBytes[2]); // Quantity of Outputs Lo of Most Significant Word
             alReturn.Add(myFloatBytes[3]); // Quantity of Outputs Hi of Least Significant Word
             alReturn.Add(myFloatBytes[2]); // Quantity of Outputs Lo of Least Significant Word
             alReturn.Add(myFloatBytes[1]); // Quantity of Outputs Hi of Most Significant Word
@@ -470,6 +468,7 @@ namespace Modbus_Example2
             // **Note: these are offset by -1 from the # you setup in vBuilder.
             alReturn.Add((byte)0x00);               // Starting Address Hi
             alReturn.Add((byte)0x00);               // Starting Address Lo. 
+
             alReturn.Add((byte)0x00);            // Quantity of Outputs Hi
             alReturn.Add((byte)0x02);            // Quantity of Outputs Lo
             alReturn.Add((byte)0x04);            // Byte Count

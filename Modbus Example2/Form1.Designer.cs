@@ -58,6 +58,8 @@
             this.label11 = new System.Windows.Forms.Label();
             this.read32Value = new System.Windows.Forms.TextBox();
             this.readFloat = new System.Windows.Forms.Button();
+            this.read32FloatValue = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.write16Value)).BeginInit();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.write32Value)).BeginInit();
@@ -256,10 +258,15 @@
             // 
             this.write32Value.Location = new System.Drawing.Point(645, 44);
             this.write32Value.Maximum = new decimal(new int[] {
-            100000,
+            2147483647,
             0,
             0,
             0});
+            this.write32Value.Minimum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            -2147483648});
             this.write32Value.Name = "write32Value";
             this.write32Value.Size = new System.Drawing.Size(120, 20);
             this.write32Value.TabIndex = 21;
@@ -350,11 +357,29 @@
             this.readFloat.UseVisualStyleBackColor = true;
             this.readFloat.Click += new System.EventHandler(this.readFloat_Click);
             // 
+            // read32FloatValue
+            // 
+            this.read32FloatValue.Location = new System.Drawing.Point(833, 186);
+            this.read32FloatValue.Name = "read32FloatValue";
+            this.read32FloatValue.Size = new System.Drawing.Size(100, 20);
+            this.read32FloatValue.TabIndex = 30;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(769, 198);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(34, 13);
+            this.label12.TabIndex = 31;
+            this.label12.Text = "Value";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1096, 426);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.read32FloatValue);
             this.Controls.Add(this.readFloat);
             this.Controls.Add(this.read32Value);
             this.Controls.Add(this.label11);
@@ -429,6 +454,8 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox read32Value;
         private System.Windows.Forms.Button readFloat;
+        private System.Windows.Forms.TextBox read32FloatValue;
+        private System.Windows.Forms.Label label12;
     }
 }
 
