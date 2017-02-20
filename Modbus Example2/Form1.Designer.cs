@@ -60,10 +60,20 @@
             this.readFloat = new System.Windows.Forms.Button();
             this.read32FloatValue = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.read32InFloatValue = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.readInFloat = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label17 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.write16Value)).BeginInit();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.write32Value)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.writeFloatValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -100,7 +110,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(122, 13);
             this.label4.TabIndex = 3;
-            this.label4.Text = "Read 16Bit Value (0x03)";
+            this.label4.Text = "Read 16Bit Value (0x04)";
             // 
             // label5
             // 
@@ -257,7 +267,7 @@
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(121, 13);
             this.label9.TabIndex = 20;
-            this.label9.Text = "Write 32Bit Value (0x??)";
+            this.label9.Text = "Write 32Bit Value (0x10)";
             // 
             // write32Value
             // 
@@ -384,11 +394,108 @@
             this.label12.TabIndex = 31;
             this.label12.Text = "Value";
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(830, 21);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(122, 13);
+            this.label13.TabIndex = 32;
+            this.label13.Text = "Read 32Bit Value (0x04)";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(835, 122);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(118, 13);
+            this.label14.TabIndex = 33;
+            this.label14.Text = "Read 32Bit Float (0x04)";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(837, 243);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(122, 13);
+            this.label15.TabIndex = 40;
+            this.label15.Text = "Read 32Bit Value (0x03)";
+            // 
+            // read32InFloatValue
+            // 
+            this.read32InFloatValue.Location = new System.Drawing.Point(888, 299);
+            this.read32InFloatValue.Name = "read32InFloatValue";
+            this.read32InFloatValue.Size = new System.Drawing.Size(100, 20);
+            this.read32InFloatValue.TabIndex = 39;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(848, 306);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(34, 13);
+            this.label16.TabIndex = 38;
+            this.label16.Text = "Value";
+            // 
+            // readInFloat
+            // 
+            this.readInFloat.Location = new System.Drawing.Point(837, 266);
+            this.readInFloat.Name = "readInFloat";
+            this.readInFloat.Size = new System.Drawing.Size(75, 23);
+            this.readInFloat.TabIndex = 37;
+            this.readInFloat.Text = "Read";
+            this.readInFloat.UseVisualStyleBackColor = true;
+            this.readInFloat.Click += new System.EventHandler(this.readInFloat_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(652, 292);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 36;
+            this.button2.Text = "Write";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(652, 266);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            2147483647,
+            0,
+            0,
+            -2147483648});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
+            this.numericUpDown1.TabIndex = 35;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(608, 244);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(121, 13);
+            this.label17.TabIndex = 34;
+            this.label17.Text = "Write 32Bit Value (0x10)";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1096, 426);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.read32InFloatValue);
+            this.Controls.Add(this.label16);
+            this.Controls.Add(this.readInFloat);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.label17);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.label13);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.read32FloatValue);
             this.Controls.Add(this.readFloat);
@@ -428,6 +535,7 @@
             this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.write32Value)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.writeFloatValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -467,6 +575,15 @@
         private System.Windows.Forms.Button readFloat;
         private System.Windows.Forms.TextBox read32FloatValue;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox read32InFloatValue;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Button readInFloat;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label17;
     }
 }
 

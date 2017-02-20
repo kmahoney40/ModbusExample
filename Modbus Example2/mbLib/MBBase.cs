@@ -44,13 +44,6 @@ namespace Modbus_Example2.mbLib
             readCmndMsg.Add(addressLo);
             readCmndMsg.Add(countOutputHi);
             readCmndMsg.Add(countOutputLo);
-            //readCmndMsg = new List<byte>();
-            //readCmndMsg.Add(deviceNumber);
-            //readCmndMsg.Add(readCmnd);
-            //readCmndMsg.Add(0);
-            //readCmndMsg.Add(2);
-            //readCmndMsg.Add(countOutputHi);
-            //readCmndMsg.Add(countOutputLo);
         }
         private void CreatWriteCmndMsg()
         {
@@ -137,22 +130,15 @@ namespace Modbus_Example2.mbLib
             switch (type)
             {
                 case ModbusObjType.Bit:
-                    //writeCmnd = (byte)0x05;
-                    //readCmnd = (byte)0x01;
                     countOutputHi = (byte)0x00;
                     countOutputLo = (byte)0x01;
                     break;
                 case ModbusObjType.Int16:
-                    //writeCmnd = (byte)0x06;
-                    //readCmnd = (byte)0x03;
                     countOutputHi = (byte)0x00;
                     countOutputLo = (byte)0x01;
                     break;
                 case ModbusObjType.Float:
                 case ModbusObjType.Int32:
-                    //writeCmnd = (byte)0x10;
-                    //readCmnd = (byte)0x04;
-                    //readCmnd = (byte)0x03;
                     countOutputHi = (byte)0x00;
                     countOutputLo = (byte)0x02;
                     break;

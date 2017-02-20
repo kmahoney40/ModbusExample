@@ -86,7 +86,6 @@ namespace Modbus_Example2
             }
             else
             {
-                //this.Invoke((MethodInvoker)delegate { checkConns(); });
                 form.Invoke((MethodInvoker)delegate { checkConns(); });
             }
         }
@@ -213,15 +212,11 @@ namespace Modbus_Example2
             {
                 form.plcStatusLabel.ForeColor = Color.Green;
                 form.plcStatusLabel.Text = "PLC Connected";
-                //PLCStatusLabel.ForeColor = Color.Green;
-                //PLCStatusLabel.Text = "PLC Connected";
             }
             else
             {
                 form.plcStatusLabel.ForeColor = Color.Red;
                 form.plcStatusLabel.Text = "PLC Disconnected";
-                //PLCStatusLabel.ForeColor = Color.Red;
-                //PLCStatusLabel.Text = "PLC Disconnected";
             }
         }
 
@@ -282,11 +277,6 @@ namespace Modbus_Example2
                     bCRCPasses = true;  // In this example, we're not doing anything with this result, but you could make sure it passes before using the data
 
 
-                /*
-                 * Add an xml or JSON file to declare addresses and data types
-                 * */
-
-
                 form.messageReceived.Text = sMessageRecieved;
 
                 byte[] byteArray = { (byte)0, (byte)0, (byte)0, (byte)0 };
@@ -301,12 +291,6 @@ namespace Modbus_Example2
 
                         break;
                     case 0x03: // Read 16Bit Command (Modbus Read Holding Registers)
-                        //byteArray[0] = readVal[4];
-                        //byteArray[1] = readVal[3];
-                        //Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
-
-                        // readVal[2] is the byte count
-
                         byteArray[0] = readVal[4];
                         byteArray[1] = readVal[3];
                         if (readVal[2] == 2)
@@ -319,45 +303,17 @@ namespace Modbus_Example2
                             byteArray[2] = readVal[6];
                             byteArray[3] = readVal[5];
                             var Float0x03 = System.BitConverter.ToSingle(byteArray, 0);
-                            form.Read32FloatValue.Text = Float0x03.ToString();
+                            form.Read32InFloatValue.Text = Float0x03.ToString();
                         }
-                        //byteArray[2] = readVal[6];
-                        //byteArray[3] = readVal[5];
-                        //var tmpp = System.BitConverter.ToSingle(byteArray, 0);
-                        //Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
-                        //var asdf = System.BitConverter.ToInt16(byteArray, 0);
-                        //float myFloa = System.BitConverter.ToSingle(byteArray, 0);
-                        ////form.Read16Value.Text = myInt16.ToString();
-                        //var tmp = Math.Round((Decimal)myFloa, 1, MidpointRounding.AwayFromZero);
-                        //form.Read16Value.Text = tmp.ToString();
-                        //form.Read16Value.Text = myInt16.ToString();
                         break;
                     case 0x04: // (Modbus Read Input Registers)
 
-                        // this is good for reading holding registers, the uncommented below
-                        // is for inpyut registers, ie therm input. Use Cmnd 3 for ordering like
-                        // the uncommentd below
-
-                        //byteArray[2] = readVal[4];
-                        //byteArray[3] = readVal[3];
-                        //byteArray[0] = readVal[6];
-                        //byteArray[1] = readVal[5];
-
-                        // use a swithc with an exception for != 2 and != 4
                         if (readVal[2] == 2)
                         {
                             byteArray[0] = readVal[4];
                             byteArray[1] = readVal[3];
-                            if (reqType.isSigned)
-                            {
-                                Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
-                                form.Read16Value.Text = myInt16.ToString();
-                            }
-                            else
-                            {
-                                UInt16 myUInt16 = System.BitConverter.ToUInt16(byteArray, 0);
-                                form.Read16Value.Text = myUInt16.ToString();
-                            }
+                            Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
+                            form.Read16Value.Text = myInt16.ToString();
                         }
                         else
                         {
@@ -370,7 +326,6 @@ namespace Modbus_Example2
                                 var i = System.BitConverter.ToUInt32(byteArray, 0);
                                 float myFloat = System.BitConverter.ToSingle(byteArray, 0);
                                 var temp = Math.Round((Decimal)myFloat, 2, MidpointRounding.AwayFromZero);
-                                //form.Read32FloatValue.Text = myFloat.ToString();
                                 form.Read32FloatValue.Text = temp.ToString();
                             }
                             else
@@ -386,12 +341,6 @@ namespace Modbus_Example2
                         break;
 
                     case 0x16:
-                        //byte[] myFloatArray = new byte[4];
-                        //myFloatArray[0] = readVal[4];
-                        //myFloatArray[1] = readVal[3];
-                        //myFloatArray[2] = readVal[6];
-                        //myFloatArray[3] = readVal[5];
-                        //float myFloat = System.BitConverter.ToSingle(myFloatArray, 0);                        
                         break;
                     case 0x17: // (Modbus Read/Write Multiple Registers)
                         break;
@@ -406,7 +355,6 @@ namespace Modbus_Example2
                 if (!_serialPort.IsOpen)
                 {
                     checkConns();
-                    //SerialComms.checkConns();
                 }
                 if (alToSend.Count > 0)
                 {
@@ -448,20 +396,15 @@ namespace Modbus_Example2
                 if (!_serialPort.IsOpen)
                 {
                     checkConns();
-                    //SerialComms.checkConns();
                 }
                 List<byte> requestBytes = plcRequest.requestBytes;
-                //if (alToSend.Count > 0)
                 if (requestBytes.Count > 0)
                 {
-                    //byte[] bytesToSend = new byte[alToSend.Count + 2]; // the 2 is for the CRC we'll add at the end
                     byte[] bytesToSend = new byte[requestBytes.Count + 2]; // the 2 is for the CRC we'll add at the end
                     String sMessageSent = "";
                     UInt16 crc16 = 0xFFFF;
-                    //for (int i = 0; i < alToSend.Count; i++)
                     for (int i = 0; i < requestBytes.Count; i++)
                     {
-                        //Byte byteFromArray = (Byte)alToSend[i];
                         Byte byteFromArray = (Byte)requestBytes[i];
                         bytesToSend[i] = byteFromArray;
                         crc16 = CalculateCRC(byteFromArray, crc16);
@@ -495,7 +438,6 @@ namespace Modbus_Example2
                 if (!_serialPort.IsOpen)
                 {
                     checkConns();
-                    //SerialComms.checkConns();
                 }
                 if (alToSend.Count > 0)
                 {

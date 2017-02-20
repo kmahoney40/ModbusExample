@@ -9,9 +9,6 @@ namespace Modbus_Example2.mbLib
     class MBBit : MBBase
     {
         public MBBit() { }
-        //public MBBit(ModbusObjInitializer initializer) :
-        //    base(initializer.deviceNum, initializer.addressHi, initializer.addressLo, 
-        //    (byte)0x05, (byte)0x01, (byte)0x00, (byte)0x01) { }
 
         public MBBit(ModbusObjInitializer initializer) : base(initializer) 
         {

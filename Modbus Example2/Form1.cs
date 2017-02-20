@@ -34,6 +34,7 @@ namespace Modbus_Example2
         public System.Windows.Forms.TextBox Read16Value { get; set; }
         public System.Windows.Forms.TextBox Read32Value { get; set; }
         public System.Windows.Forms.TextBox Read32FloatValue { get; set; }
+        public System.Windows.Forms.TextBox Read32InFloatValue { get; set; }
 
         public Form1()
         {
@@ -44,6 +45,7 @@ namespace Modbus_Example2
             messageSent = this.MessageSent;
             ReadBitValue = this.readBitValue;
             Read32FloatValue = this.read32FloatValue;
+            Read32InFloatValue = this.read32InFloatValue;
             Read32Value = this.read32Value;
             Read16Value = this.read16Value;
             SerialComms = new USBSerialComms(this);
@@ -774,6 +776,14 @@ namespace Modbus_Example2
             Read32BitMessage(plcRequest);
         }
 
+        private void readInFloat_Click(object sender, EventArgs e)
+        {
+            var thisMob = MBLst[4];
+            var plcRequst = new PlcRequest(true, true);
+            plcRequst.requestBytes = new List<byte>(thisMob.readCmndMsg);
+            Read32BitMessage(plcRequst);
+        }
+
         private void write32value_ValueChanged(object sender, EventArgs e)
         {
 
@@ -821,6 +831,5 @@ namespace Modbus_Example2
         {
 
         }
-
     }
 }
