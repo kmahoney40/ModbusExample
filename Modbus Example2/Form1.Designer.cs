@@ -204,7 +204,6 @@
             this.MessageRecieved.Name = "MessageRecieved";
             this.MessageRecieved.Size = new System.Drawing.Size(344, 20);
             this.MessageRecieved.TabIndex = 13;
-            this.MessageRecieved.TextChanged += new System.EventHandler(this.MessageRecieved_TextChanged);
             // 
             // MessageSent
             // 
@@ -285,7 +284,6 @@
             this.write32Value.Name = "write32Value";
             this.write32Value.Size = new System.Drawing.Size(120, 20);
             this.write32Value.TabIndex = 21;
-            this.write32Value.ValueChanged += new System.EventHandler(this.write32value_ValueChanged);
             // 
             // write32
             // 
@@ -329,7 +327,6 @@
             this.writeFloatValue.Name = "writeFloatValue";
             this.writeFloatValue.Size = new System.Drawing.Size(120, 20);
             this.writeFloatValue.TabIndex = 24;
-            this.writeFloatValue.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label10
             // 
@@ -339,7 +336,6 @@
             this.label10.Size = new System.Drawing.Size(116, 13);
             this.label10.TabIndex = 25;
             this.label10.Text = "Write 32bit Float (0x10)";
-            this.label10.Click += new System.EventHandler(this.label10_Click);
             // 
             // writeFloat
             // 
@@ -383,7 +379,6 @@
             this.read32FloatValue.Name = "read32FloatValue";
             this.read32FloatValue.Size = new System.Drawing.Size(100, 20);
             this.read32FloatValue.TabIndex = 30;
-            this.read32FloatValue.TextChanged += new System.EventHandler(this.read32FloatValue_TextChanged);
             // 
             // label12
             // 
@@ -449,6 +444,7 @@
             // 
             // button2
             // 
+            this.button2.Enabled = false;
             this.button2.Location = new System.Drawing.Point(652, 292);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
@@ -458,6 +454,7 @@
             // 
             // numericUpDown1
             // 
+            this.numericUpDown1.Enabled = false;
             this.numericUpDown1.Location = new System.Drawing.Point(652, 266);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             2147483647,
@@ -476,6 +473,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
+            this.label17.Enabled = false;
             this.label17.Location = new System.Drawing.Point(608, 244);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(121, 13);
