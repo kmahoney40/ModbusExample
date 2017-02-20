@@ -62,9 +62,11 @@ namespace Modbus_Example2
                     var appName = app.Key;
                     var type = (String)app.Value["Type"];
                     byte device = (byte)app.Value["Device"];
+                    byte writeCmnd = (byte)app.Value["WriteCmnd"];
+                    byte readCmnd = (byte)app.Value["ReadCmnd"];
                     byte addHi = (byte)app.Value["addHi"];
                     byte addLo = (byte)app.Value["addLo"];
-                    ModbusObjInitializer init = new ModbusObjInitializer(type, device, addHi, addLo);
+                    ModbusObjInitializer init = new ModbusObjInitializer(type, device, writeCmnd, readCmnd, addHi, addLo);
                     MBLst.Add(mbFactory.GetModbusObj(init));
                 }
             }
@@ -528,7 +530,15 @@ namespace Modbus_Example2
             alReturn.Add(byteConversion[1]);
             alReturn.Add(byteConversion[0]);
 
-            SerialComms.sendMessage(alReturn);
+            //SerialComms.sendMessage(alReturn);
+
+            var thisMbo = MBLst[2];
+            SerialComms.sendMessage(thisMbo.GetWriteCmndMsg((Int16)iValue));
+        }
+
+        private void WriteUInt16_Click(object sender, EventArgs e)
+        {
+            var thisMbo = MBLst[2];
         }
 
         private void WriteFloatMessage(float fValue)
@@ -613,10 +623,13 @@ namespace Modbus_Example2
             ////sendMessage(alReturn);
             //SerialComms.sendMessage(plcRequest);
 
-            var thisMbo = MBLst[1];
+
+
+            var thisMbo = MBLst[3];
+            List<byte> lb = thisMbo.GetWriteCmndMsg(iValue);
             //sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
             //SerialComms.sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
-            SerialComms.sendMessage(thisMbo.GetWriteCmndMsg(iValue));
+            SerialComms.sendMessage(lb);
 
         }
 
@@ -662,8 +675,23 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x01);               // Quantity of Outputs Lo
 
             //sendMessage(alReturn);
-            SerialComms.sendMessage(alReturn);
+            //SerialComms.sendMessage(alReturn);
 
+            var thisMbo = MBLst[2];
+            var plcRequest = new PlcRequest(false, false);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            SerialComms.sendMessage(plcRequest);
+
+
+            //var thisMbo = MBLst[1];
+            //var plcRequest = new PlcRequest(true, false);
+            //plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            //Read32BitMessage(plcRequest);
+
+        }
+
+        private void ReadUInt16_Click(object sender, EventArgs e)
+        {
 
         }
 
@@ -717,14 +745,14 @@ namespace Modbus_Example2
         }
         public void Read32BitMessage(PlcRequest plcRequest)
         {
-            plcRequest.requestBytes.Add((byte)0x01);
-            plcRequest.requestBytes.Add((byte)0x04);
+            //plcRequest.requestBytes.Add((byte)0x01);
+            //plcRequest.requestBytes.Add((byte)0x04);
 
-            plcRequest.requestBytes.Add((byte)0x00);
-            plcRequest.requestBytes.Add((byte)0x00);
+            //plcRequest.requestBytes.Add((byte)0x00);
+            //plcRequest.requestBytes.Add((byte)0x00);
 
-            plcRequest.requestBytes.Add((byte)0x00);
-            plcRequest.requestBytes.Add((byte)0x02);
+            //plcRequest.requestBytes.Add((byte)0x00);
+            //plcRequest.requestBytes.Add((byte)0x02);
             SerialComms.sendMessage(plcRequest);
         }
         public void ReadFloatMessage()
@@ -739,7 +767,10 @@ namespace Modbus_Example2
              *      bool isSigned;
              * }
              */
+
+            var thisMbo = MBLst[1];
             var plcRequest = new PlcRequest(true, false);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
             Read32BitMessage(plcRequest);
         }
 
@@ -755,7 +786,9 @@ namespace Modbus_Example2
 
         private void read32_Click(object sender, EventArgs e)
         {
-            var plcRequest = new PlcRequest(false, false);
+            var thisMbo = MBLst[3];
+            var plcRequest = new PlcRequest(false, true);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
             Read32BitMessage(plcRequest);
         }
 
@@ -788,5 +821,6 @@ namespace Modbus_Example2
         {
 
         }
+
     }
 }

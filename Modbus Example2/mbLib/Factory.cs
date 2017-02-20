@@ -8,8 +8,10 @@ namespace Modbus_Example2.mbLib
     public enum ModbusObjType
     {
         Bit,
-        Bit16,
-        Bit32
+        UInt16,
+        Int16,
+        Float,
+        Int32
     }
 
     class Factory
@@ -20,9 +22,10 @@ namespace Modbus_Example2.mbLib
             {
                 case ModbusObjType.Bit:
                     return new MBBit(initializer);
-                case ModbusObjType.Bit16:
-                    throw new NotSupportedException();
-                case ModbusObjType.Bit32:
+                case ModbusObjType.Int16:
+                    return new MB16Bit(initializer);
+                case ModbusObjType.Float:
+                case ModbusObjType.Int32:
                     return new MB32Bit(initializer);
                 default:
                     throw new NotSupportedException();

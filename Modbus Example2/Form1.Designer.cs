@@ -123,7 +123,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(88, 142);
+            this.label7.Location = new System.Drawing.Point(88, 336);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(78, 13);
             this.label7.TabIndex = 6;
@@ -132,7 +132,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(64, 168);
+            this.label8.Location = new System.Drawing.Point(64, 362);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(102, 13);
             this.label8.TabIndex = 7;
@@ -190,7 +190,7 @@
             // 
             // MessageRecieved
             // 
-            this.MessageRecieved.Location = new System.Drawing.Point(169, 165);
+            this.MessageRecieved.Location = new System.Drawing.Point(169, 359);
             this.MessageRecieved.Name = "MessageRecieved";
             this.MessageRecieved.Size = new System.Drawing.Size(344, 20);
             this.MessageRecieved.TabIndex = 13;
@@ -198,7 +198,7 @@
             // 
             // MessageSent
             // 
-            this.MessageSent.Location = new System.Drawing.Point(169, 139);
+            this.MessageSent.Location = new System.Drawing.Point(169, 333);
             this.MessageSent.Name = "MessageSent";
             this.MessageSent.Size = new System.Drawing.Size(344, 20);
             this.MessageSent.TabIndex = 14;

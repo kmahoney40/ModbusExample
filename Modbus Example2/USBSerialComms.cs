@@ -289,7 +289,7 @@ namespace Modbus_Example2
 
                 form.messageReceived.Text = sMessageRecieved;
 
-                byte[] byteArray = new byte[4];
+                byte[] byteArray = { (byte)0, (byte)0, (byte)0, (byte)0 };
 
                 switch (readVal[1])
                 {
@@ -301,26 +301,85 @@ namespace Modbus_Example2
 
                         break;
                     case 0x03: // Read 16Bit Command (Modbus Read Holding Registers)
+                        //byteArray[0] = readVal[4];
+                        //byteArray[1] = readVal[3];
+                        //Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
+
+                        // readVal[2] is the byte count
+
                         byteArray[0] = readVal[4];
                         byteArray[1] = readVal[3];
-                        Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
-                        form.Read16Value.Text = myInt16.ToString();
-                        break;
-                    case 0x04: // (Modbus Read Input Registers)
-                        byteArray[2] = readVal[4];
-                        byteArray[3] = readVal[3];
-                        byteArray[0] = readVal[6];
-                        byteArray[1] = readVal[5];
-                        if (reqType.isFloat)
+                        if (readVal[2] == 2)
                         {
-                            float myFloat = System.BitConverter.ToSingle(byteArray, 0);
-                            form.Read32FloatValue.Text = myFloat.ToString();
+                            Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
+                            form.Read16Value.Text = myInt16.ToString();
                         }
                         else
                         {
-                            Int32 myInt = System.BitConverter.ToInt32(byteArray, 0);
-                            form.Read32Value.Text = myInt.ToString();
+                            byteArray[2] = readVal[6];
+                            byteArray[3] = readVal[5];
+                            var Float0x03 = System.BitConverter.ToSingle(byteArray, 0);
+                            form.Read32FloatValue.Text = Float0x03.ToString();
                         }
+                        //byteArray[2] = readVal[6];
+                        //byteArray[3] = readVal[5];
+                        //var tmpp = System.BitConverter.ToSingle(byteArray, 0);
+                        //Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
+                        //var asdf = System.BitConverter.ToInt16(byteArray, 0);
+                        //float myFloa = System.BitConverter.ToSingle(byteArray, 0);
+                        ////form.Read16Value.Text = myInt16.ToString();
+                        //var tmp = Math.Round((Decimal)myFloa, 1, MidpointRounding.AwayFromZero);
+                        //form.Read16Value.Text = tmp.ToString();
+                        //form.Read16Value.Text = myInt16.ToString();
+                        break;
+                    case 0x04: // (Modbus Read Input Registers)
+
+                        // this is good for reading holding registers, the uncommented below
+                        // is for inpyut registers, ie therm input. Use Cmnd 3 for ordering like
+                        // the uncommentd below
+
+                        //byteArray[2] = readVal[4];
+                        //byteArray[3] = readVal[3];
+                        //byteArray[0] = readVal[6];
+                        //byteArray[1] = readVal[5];
+
+                        // use a swithc with an exception for != 2 and != 4
+                        if (readVal[2] == 2)
+                        {
+                            byteArray[0] = readVal[4];
+                            byteArray[1] = readVal[3];
+                            if (reqType.isSigned)
+                            {
+                                Int16 myInt16 = System.BitConverter.ToInt16(byteArray, 0);
+                                form.Read16Value.Text = myInt16.ToString();
+                            }
+                            else
+                            {
+                                UInt16 myUInt16 = System.BitConverter.ToUInt16(byteArray, 0);
+                                form.Read16Value.Text = myUInt16.ToString();
+                            }
+                        }
+                        else
+                        {
+                            byteArray[2] = readVal[4];
+                            byteArray[3] = readVal[3];
+                            byteArray[0] = readVal[6];
+                            byteArray[1] = readVal[5];
+                            if (reqType.isFloat)
+                            {
+                                var i = System.BitConverter.ToUInt32(byteArray, 0);
+                                float myFloat = System.BitConverter.ToSingle(byteArray, 0);
+                                var temp = Math.Round((Decimal)myFloat, 2, MidpointRounding.AwayFromZero);
+                                //form.Read32FloatValue.Text = myFloat.ToString();
+                                form.Read32FloatValue.Text = temp.ToString();
+                            }
+                            else
+                            {
+                                Int32 myInt = System.BitConverter.ToInt32(byteArray, 0);
+                                form.Read32Value.Text = myInt.ToString();
+                            }
+                        }
+
                         break;
 
                     case 0x05:    // (Modbus Write Single Coil)

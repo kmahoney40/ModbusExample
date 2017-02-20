@@ -62,6 +62,7 @@
     <Compile Include="mbLib\MBBase.cs" />
     <Compile Include="mbLib\MBBit.cs" />
     <Compile Include="mbLib\MB32Bit.cs" />
+    <Compile Include="mbLib\MBFloat.cs" />
     <Compile Include="PlcRequest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
