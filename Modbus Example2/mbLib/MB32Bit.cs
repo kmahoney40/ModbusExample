@@ -33,7 +33,7 @@ namespace Modbus_Example2.mbLib
 
         public override List<byte> GetWriteCmndMsg(float value)
         {
-            Byte[] myFloatBytes = new Byte[4];
+            Byte[] myFloatBytes = new byte[4];
             myFloatBytes = BitConverter.GetBytes(value);
 
             writeCmndMsg[7] = myFloatBytes[3];
@@ -56,6 +56,7 @@ namespace Modbus_Example2.mbLib
 
             return writeCmndMsg;
         }
+
 
         public override List<byte> formatWrite(float value)
         {

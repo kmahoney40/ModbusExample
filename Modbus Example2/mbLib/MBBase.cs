@@ -44,12 +44,20 @@ namespace Modbus_Example2.mbLib
             readCmndMsg.Add(addressLo);
             readCmndMsg.Add(countOutputHi);
             readCmndMsg.Add(countOutputLo);
+            //readCmndMsg = new List<byte>();
+            //readCmndMsg.Add(deviceNumber);
+            //readCmndMsg.Add(readCmnd);
+            //readCmndMsg.Add(0);
+            //readCmndMsg.Add(2);
+            //readCmndMsg.Add(countOutputHi);
+            //readCmndMsg.Add(countOutputLo);
         }
         private void CreatWriteCmndMsg()
         {
             writeCmndMsg = new List<byte>();
             writeCmndMsg.Add(deviceNumber);
             writeCmndMsg.Add(writeCmnd);
+            //writeCmndMsg.Add(0x10);
             writeCmndMsg.Add(addressHi);
             writeCmndMsg.Add(addressLo);
         }
@@ -71,7 +79,8 @@ namespace Modbus_Example2.mbLib
         virtual public List<byte> formatWrite(Int32 value) { return new List<byte>(); }
 
         virtual public List<byte> GetWriteCmndMsg(byte value) { return new List<byte>(); }
-        //virtual public List<byte> SetCmndValue(Int16 value);
+        virtual public List<byte> GetWriteCmndMsg(Int16 value) { return new List<byte>(); }
+        virtual public List<byte> GetWriteCmndMsg(UInt16 value) { return new List<byte>(); }
         virtual public List<byte> GetWriteCmndMsg(float value) { return new List<byte>(); }
         virtual public List<byte> GetWriteCmndMsg(Int32 value) { return new List<byte>(); }
         //virtual public List<byte> GetWriteCmndMsg(Int32 value);
@@ -90,10 +99,12 @@ namespace Modbus_Example2.mbLib
         public byte readCmnd { get; set; }
         public byte countOutputHi { get; set; }
         public byte countOutputLo { get; set; }
-        public ModbusObjInitializer(string type, byte deviceNum, byte addressHi, byte addressLo)
+        public ModbusObjInitializer(string type, byte deviceNum, byte writeCmnd, byte readCmnd, byte addressHi, byte addressLo)
         {
             this.type = ConvertToModbusObjType(type);
             this.deviceNum = deviceNum;
+            this.writeCmnd = writeCmnd;
+            this.readCmnd = readCmnd;
             this.addressHi = addressHi;
             this.addressLo = addressLo;
             setReadWriteCmnd();
@@ -111,9 +122,12 @@ namespace Modbus_Example2.mbLib
             {
                 case "Bit":
                     return ModbusObjType.Bit;
+                case "Int16":
+                    return ModbusObjType.Int16;
                 case "Float":
-                case "32Bit":
-                    return ModbusObjType.Bit32;
+                    return ModbusObjType.Float;
+                case "Int32":
+                    return ModbusObjType.Int32;
                 default:
                     throw new NotSupportedException();
             }
@@ -123,18 +137,22 @@ namespace Modbus_Example2.mbLib
             switch (type)
             {
                 case ModbusObjType.Bit:
-                    writeCmnd = (byte)0x05;
-                    readCmnd = (byte)0x01;
+                    //writeCmnd = (byte)0x05;
+                    //readCmnd = (byte)0x01;
                     countOutputHi = (byte)0x00;
                     countOutputLo = (byte)0x01;
                     break;
-                case ModbusObjType.Bit16:
-                    writeCmnd = (byte)0x06;
-                    readCmnd = (byte)0x03;
+                case ModbusObjType.Int16:
+                    //writeCmnd = (byte)0x06;
+                    //readCmnd = (byte)0x03;
+                    countOutputHi = (byte)0x00;
+                    countOutputLo = (byte)0x01;
                     break;
-                case ModbusObjType.Bit32:
-                    writeCmnd = (byte)0x10;
-                    readCmnd = (byte)0x04;
+                case ModbusObjType.Float:
+                case ModbusObjType.Int32:
+                    //writeCmnd = (byte)0x10;
+                    //readCmnd = (byte)0x04;
+                    //readCmnd = (byte)0x03;
                     countOutputHi = (byte)0x00;
                     countOutputLo = (byte)0x02;
                     break;
