@@ -14,43 +14,97 @@ using System.IO.Ports;
 using System.Collections;
 using System.Management;
 using System.Diagnostics;
+using Modbus_Example2.mbLib;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace Modbus_Example2
 {
     public partial class Form1 : Form
     {
+        private List<MBBase> MBLst = new List<MBBase>();
+        private int lastSent = -1;
+        private USBSerialComms SerialComms;
+        public System.Windows.Forms.ToolStripStatusLabel plcStatusLabel { get; set; }
+        public System.Windows.Forms.TextBox messageReceived { get; set; }
+        public System.Windows.Forms.TextBox messageSent { get; set; }
+        public System.Windows.Forms.TextBox ReadBitValue { get; set; }
+        public System.Windows.Forms.TextBox Read16Value { get; set; }
+        public System.Windows.Forms.TextBox Read32Value { get; set; }
+        public System.Windows.Forms.TextBox Read32FloatValue { get; set; }
+
         public Form1()
         {
             InitializeComponent();
+
+            plcStatusLabel = this.PLCStatusLabel;
+            messageReceived = this.MessageRecieved;
+            messageSent = this.MessageSent;
+            ReadBitValue = this.readBitValue;
+            Read32FloatValue = this.read32FloatValue;
+            Read32Value = this.read32Value;
+            Read16Value = this.read16Value;
+            SerialComms = new USBSerialComms(this);
+
+            Factory mbFactory = new Factory();
+
+            var json = System.IO.File.ReadAllText(@"c:\users\kevin\desktop\modbus.json");
+
+            var objects = JArray.Parse(json); // parse as array  
+            foreach (JObject root in objects)
+            {
+                foreach (KeyValuePair<String, JToken> app in root)
+                {
+                    var n = app.Key;
+
+                    var appName = app.Key;
+                    var type = (String)app.Value["Type"];
+                    byte device = (byte)app.Value["Device"];
+                    byte writeCmnd = (byte)app.Value["WriteCmnd"];
+                    byte readCmnd = (byte)app.Value["ReadCmnd"];
+                    byte addHi = (byte)app.Value["addHi"];
+                    byte addLo = (byte)app.Value["addLo"];
+                    ModbusObjInitializer init = new ModbusObjInitializer(type, device, writeCmnd, readCmnd, addHi, addLo);
+                    MBLst.Add(mbFactory.GetModbusObj(init));
+                }
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Process[] pname = Process.GetProcessesByName("vFactory");
-            Process[] pnameViewer = Process.GetProcessesByName("vFactory Viewer");
-            Process[] pnameBuilder = Process.GetProcessesByName("vBuilder");
-
-            if (pname.Length != 0)
-            {
-                MessageBox.Show("This and vFactory can't run at the same time.  \nClose vFactory or vFactory Viewer before runing This.");
-                this.Close();
-            }
-            else if (pnameViewer.Length != 0)
-            {
-                MessageBox.Show("This and vFactory Viewer can't run at the same time.  \nClose vFactory Viewer before runing This.");
-                this.Close();
-            }
-            else if (pnameBuilder.Length != 0)
-            {
-                MessageBox.Show("This and vBuilder can't run at the same time.  \nClose vBuilder before runing This.");
-                this.Close();
-            }
-            else
-            {
-                this.Invoke((MethodInvoker)delegate { checkConns(); });
-            }
+            SerialComms.CloseIfAnotherProcessIsUsingDevice();
         }
+
+        //private void CloseIfAnotherProcessIsUsingDevice()
+        //{
+        //    Process[] pname = Process.GetProcessesByName("vFactory");
+        //    Process[] pnameViewer = Process.GetProcessesByName("vFactory Viewer");
+        //    Process[] pnameBuilder = Process.GetProcessesByName("vBuilder");
+
+        //    if (pname.Length != 0)
+        //    {
+        //        MessageBox.Show("This and vFactory can't run at the same time.  \nClose vFactory or vFactory Viewer before runing This.");
+        //        this.Close();
+        //    }
+        //    else if (pnameViewer.Length != 0)
+        //    {
+        //        MessageBox.Show("This and vFactory Viewer can't run at the same time.  \nClose vFactory Viewer before runing This.");
+        //        this.Close();
+        //    }
+        //    else if (pnameBuilder.Length != 0)
+        //    {
+        //        MessageBox.Show("This and vBuilder can't run at the same time.  \nClose vBuilder before runing This.");
+        //        this.Close();
+        //    }
+        //    else
+        //    {
+        //        //this.Invoke((MethodInvoker)delegate { checkConns(); });
+        //        this.Invoke((MethodInvoker)delegate { SerialComms.checkConns(); });
+        //    }
+        //}
+
         SerialPort _serialPort = new SerialPort();
         private const int WM_DEVICECHANGE = 0x0219;
         protected override void WndProc(ref Message m)
@@ -59,7 +113,9 @@ namespace Modbus_Example2
 
             if (m.Msg == WM_DEVICECHANGE)
             {
-                this.Invoke((MethodInvoker)delegate { checkConns(); });
+                //this.Invoke((MethodInvoker)delegate { checkConns(); });
+                this.Invoke((MethodInvoker)delegate { SerialComms.checkConns(); });
+                
             }
         }
         bool bInsideCheckConns = false;
@@ -89,8 +145,9 @@ namespace Modbus_Example2
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                // Ignore this exception
             }
 
             string[] usbDevices = list.Distinct().OrderBy(s => s).ToArray();
@@ -129,7 +186,7 @@ namespace Modbus_Example2
                             ci.friendlyName = s;
                             alCommPortInfo.Add(ci);
                         }
-                        String[] usbDevs = GetUSBCOMDevices();
+                        String[] usbDevs = USBSerialComms.GetUSBCOMDevices();
 
 
                         foreach (String s in usbDevs)
@@ -294,6 +351,7 @@ namespace Modbus_Example2
                 {
                     case 0x01: // Read Bit Command (Modbus Read Coils Command)
                     case 0x02: // (Modbus Read Discrete Inputs)
+                        lastSent = -1;
                         int iMessageLength = readVal[2]; // Byte Count (# of data bytes)
                         UInt16 messageValue = (UInt16)(readVal[3]); // the bit value(s).  In our case we're only reading 1 bit.
                         readBitValue.Text = messageValue.ToString();
@@ -305,7 +363,7 @@ namespace Modbus_Example2
                         read16Value.Text = val.ToString();
                         break;
                     case 0x04: // (Modbus Read Input Registers)
-
+                        lastSent = -1;
                         byte[] myFloatArray = new byte[4];
                         float myFloat = System.BitConverter.ToSingle(myFloatArray, 0);
                         myFloatArray[2] = readVal[4];
@@ -320,7 +378,7 @@ namespace Modbus_Example2
                         UInt32 val1 = (UInt32)(readVal[4] + readVal[3] * 0x100) * 65536;
                         UInt32 val2 = (UInt32)(readVal[6] + readVal[5] * 0x100);
                         UInt32 valToDisplay = val1 + val2;
-                         read32Value.Text = valToDisplay.ToString(); 
+                        read32Value.Text = valToDisplay.ToString(); 
                         break;
                     //case 0x04: // (Modbus Read Input Registers)
                     //     byte[] myI32Array = new byte[4];
@@ -353,6 +411,7 @@ namespace Modbus_Example2
                 if (!_serialPort.IsOpen)
                 {
                     checkConns();
+                    //SerialComms.checkConns();
                 }
                 if (alToSend.Count > 0)
                 {
@@ -384,29 +443,75 @@ namespace Modbus_Example2
                 }
             }
         }
-        public void WriteBitMessage(int iValue)
+        public void sendMessage(List<byte> alToSend)
         {
-            ArrayList alReturn = new ArrayList();
-            alReturn.Add((byte)0x01); // PLC ID# in this example we set it to 1
-            alReturn.Add((byte)0x05); // Write Bit (Modbus Write Single Coil)
-
-
-            //In this example we're just sending this to address 0.
-            // **Note: these are offset by -1 from the # you setup in vBuilder.
-            alReturn.Add((byte)0x00);               // Starting Address Hi
-            alReturn.Add((byte)0x00);               // Starting Address Lo. 
-
-            if (iValue == 1)
+            if (_serialPort != null)
             {
-                alReturn.Add((byte)0xFF);            // Quantity of Outputs Hi
-            }
-            else
-            {
-                alReturn.Add((byte)0x00);            // Quantity of Outputs Hi
-            }
-            alReturn.Add((byte)0x00);                // Quantity of Outputs Lo
+                if (!_serialPort.IsOpen)
+                {
+                    //checkConns();
+                    SerialComms.checkConns();
+                }
+                if (alToSend.Count > 0)
+                {
+                    byte[] bytesToSend = new byte[alToSend.Count + 2]; // the 2 is for the CRC we'll add at the end
+                    String sMessageSent = "";
+                    UInt16 crc16 = 0xFFFF;
+                    for (int i = 0; i < alToSend.Count; i++)
+                    {
+                        Byte byteFromArray = (Byte)alToSend[i];
+                        bytesToSend[i] = byteFromArray;
+                        crc16 = CalculateCRC(byteFromArray, crc16);
+                        sMessageSent += bytesToSend[i].ToString("X").PadLeft(2, '0') + " ";
+                    }
 
-            sendMessage(alReturn);
+                    bytesToSend[bytesToSend.Count() - 2] = (Byte)(crc16 % 0x100);
+                    sMessageSent += bytesToSend[bytesToSend.Count() - 2].ToString("X").PadLeft(2, '0') + " ";
+
+                    bytesToSend[bytesToSend.Count() - 1] = (Byte)(crc16 / 0x100);
+                    sMessageSent += bytesToSend[bytesToSend.Count() - 1].ToString("X").PadLeft(2, '0') + " ";
+
+                    MessageSent.Text = sMessageSent;
+                    try
+                    {
+                        _serialPort.Write(bytesToSend, 0, bytesToSend.Length);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+        public void WriteBitMessage(Int16 iValue)
+        {
+            //ArrayList alReturn = new ArrayList();
+            //alReturn.Add((byte)0x01); // PLC ID# in this example we set it to 1
+            //alReturn.Add((byte)0x05); // Write Bit (Modbus Write Single Coil)
+
+
+            ////In this example we're just sending this to address 0.
+            //// **Note: these are offset by -1 from the # you setup in vBuilder.
+            //alReturn.Add((byte)0x00);               // Starting Address Hi
+            //alReturn.Add((byte)0x00);               // Starting Address Lo. 
+
+            //if (iValue == 1)
+            //{
+            //    alReturn.Add((byte)0xFF);            // Quantity of Outputs Hi
+            //}
+            //else
+            //{
+            //    alReturn.Add((byte)0x00);            // Quantity of Outputs Hi
+            //}
+            //alReturn.Add((byte)0x00);                // Quantity of Outputs Lo
+
+            ////sendMessage(alReturn);
+            //MBBit thisMbo = new MBBit((byte)0x01, (byte)0x00, (byte)0x00);
+
+            //lastSent = 0;
+            var thisMbo = MBLst[0];
+            //sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            //SerialComms.sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            SerialComms.sendMessage(thisMbo.GetWriteCmndMsg((byte)iValue));
         }
 
         public void Write16BitMessage(int iValue)
@@ -421,45 +526,68 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x00);               // Starting Address Hi
             alReturn.Add((byte)0x02);               // Starting Address Lo. 
 
-            UInt16 reg7Val = (UInt16)this.write16Value.Value;
-            Byte byHi = (Byte)(reg7Val / 0x100);
-            Byte byLo = (Byte)(reg7Val);
-            alReturn.Add(byHi);            // Quantity of Outputs Hi
-            alReturn.Add(byLo);            // Quantity of Outputs Lo
+            var byteConversion = BitConverter.GetBytes((Int16)iValue);
+            alReturn.Add(byteConversion[1]);
+            alReturn.Add(byteConversion[0]);
 
-            sendMessage(alReturn);
+            //SerialComms.sendMessage(alReturn);
+
+            var thisMbo = MBLst[2];
+            SerialComms.sendMessage(thisMbo.GetWriteCmndMsg((Int16)iValue));
+        }
+
+        private void WriteUInt16_Click(object sender, EventArgs e)
+        {
+            var thisMbo = MBLst[2];
         }
 
         private void WriteFloatMessage(float fValue)
         {
-            ArrayList alReturn = new ArrayList();
-            alReturn.Add((byte)0x01); // PLC ID# in this example we set it to 1
-            alReturn.Add((byte)0x10); // Write multiple 16Bit values (Modbus Write Multiple Registers)
+            //ArrayList alReturn = new ArrayList();
+            //alReturn.Add((byte)0x01); // PLC ID# in this example we set it to 1
+            //alReturn.Add((byte)0x10); // Write multiple 16Bit values (Modbus Write Multiple Registers)
 
-            //In this example we're just sending this to address 0.
-            // **Note: these are offset by -1 from the # you setup in vBuilder.
-            alReturn.Add((byte)0x00); // Starting Address Hi
-            alReturn.Add((byte)0x00); // Starting Address Lo. 
+            ////In this example we're just sending this to address 0.
+            //// **Note: these are offset by -1 from the # you setup in vBuilder.
+            //alReturn.Add((byte)0x00); // Starting Address Hi
+            //alReturn.Add((byte)0x00); // Starting Address Lo. 
 
-            alReturn.Add((byte)0x00); // Quantity of Registers Hi
-            alReturn.Add((byte)0x02); // Quantity of Registers Lo. 
+            //alReturn.Add((byte)0x00); // Quantity of Registers Hi
+            //alReturn.Add((byte)0x02); // Quantity of Registers Lo. 
 
-            alReturn.Add((byte)0x04); // ByteCount in this case we're sending 4 bytes 
+            //alReturn.Add((byte)0x04); // ByteCount in this case we're sending 4 bytes 
 
-            Byte[] myFloatBytes = new Byte[4];
-            myFloatBytes = BitConverter.GetBytes(fValue);
+            //Byte[] myFloatBytes = new Byte[4];
+            //myFloatBytes = BitConverter.GetBytes(fValue);
 
-            alReturn.Add(myFloatBytes[3]); // Quantity of Outputs Hi of Least Significant Word
-            alReturn.Add(myFloatBytes[2]); // Quantity of Outputs Lo of Least Significant Word
-            alReturn.Add(myFloatBytes[1]); // Quantity of Outputs Hi of Most Significant Word
-            alReturn.Add(myFloatBytes[0]); // Quantity of Outputs Lo of Most Significant Word
+            //Byte[] ab = new Byte[4];
+            //Byte[] bb = new Byte[4];
+            //ab = BitConverter.GetBytes((float)2.0);
+            //bb = BitConverter.GetBytes((float)((-1)*(2.0)));
 
-            sendMessage(alReturn);
+            //alReturn.Add(myFloatBytes[3]); // Quantity of Outputs Hi of Least Significant Word
+            //alReturn.Add(myFloatBytes[2]); // Quantity of Outputs Lo of Least Significant Word
+            //alReturn.Add(myFloatBytes[1]); // Quantity of Outputs Hi of Most Significant Word
+            //alReturn.Add(myFloatBytes[0]); // Quantity of Outputs Lo of Most Significant Word
+
+            //sendMessage(alReturn);
+            //lastSent = 1;
+            //MB32Bit mb32Bit = new MB32Bit((byte)0x01, (byte)0x00, (byte)0x00);
+            ////sendMessage(new ArrayList(mbFloat.formatWrite(fValue)));
+            //List<byte> byteArray = mb32Bit.formatWrite(fValue);
+            //PlcRequest plcRequest = new PlcRequest(byteArray, true, false);
+            ////SerialComms.sendMessage(new ArrayList(mbFloat.formatWrite(fValue)), 1);
+            //SerialComms.sendMessage(plcRequest);
+
+            var thisMbo = MBLst[1];
+            //sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            //SerialComms.sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            SerialComms.sendMessage(thisMbo.GetWriteCmndMsg(fValue));
         }   
 
-        private void Write32BitMessage(int p)   
+        private void Write32BitMessage(int iValue)   
         {
-            ArrayList alReturn = new ArrayList();
+            List<byte> alReturn = new List<byte>();
             alReturn.Add((byte)0x01); // PLC ID# in this example we set it to 1
             alReturn.Add((byte)0x10); // Write 16Bit (Modbus Write Single Coil)
 
@@ -473,17 +601,36 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x02);            // Quantity of Outputs Lo
             alReturn.Add((byte)0x04);            // Byte Count
 
-            UInt32 reg7Val = (UInt32)this.write32Value.Value;
-            Byte byHi = (Byte)(reg7Val / 0x100);
-            Byte byLo = (Byte)(reg7Val);
-            Byte byHi1 = (Byte)(reg7Val / 0x1000000);
-            Byte byLo1 = (Byte)(reg7Val / 0x10000);
-            alReturn.Add(byHi1);            // Quantity of Outputs Hi
-            alReturn.Add(byLo1);            // Quantity of Outputs Lo
-            alReturn.Add(byHi);            // Quantity of Outputs Hi
-            alReturn.Add(byLo);            // Quantity of Outputs Lo
+            //UInt32 reg7Val = (UInt32)this.write32Value.Value;
+            //Byte byHi = (Byte)(reg7Val / 0x100);
+            //Byte byLo = (Byte)(reg7Val);
+            //Byte byHi1 = (Byte)(reg7Val / 0x1000000);
+            //Byte byLo1 = (Byte)(reg7Val / 0x10000);
+            //alReturn.Add(byHi1);            // Quantity of Outputs Hi
+            //alReturn.Add(byLo1);            // Quantity of Outputs Lo
+            //alReturn.Add(byHi);            // Quantity of Outputs Hi
+            //alReturn.Add(byLo);            // Quantity of Outputs Lo
 
-            sendMessage(alReturn);
+            Byte[] myIntBytes = BitConverter.GetBytes(iValue);
+            alReturn.Add(myIntBytes[3]);            // Quantity of Outputs Hi
+            alReturn.Add(myIntBytes[2]);            // Quantity of Outputs Lo
+            alReturn.Add(myIntBytes[1]);            // Quantity of Outputs Hi
+            alReturn.Add(myIntBytes[0]);            // Quantity of Outputs Lo
+
+            //MB32Bit mb32Bit = new MB32Bit((byte)0x01, (byte)0x00, (byte)0x00);
+            //List<byte> byteArray = mb32Bit.formatWrite(iValue);
+            //PlcRequest plcRequest = new PlcRequest(byteArray, false, false);
+            ////sendMessage(alReturn);
+            //SerialComms.sendMessage(plcRequest);
+
+
+
+            var thisMbo = MBLst[3];
+            List<byte> lb = thisMbo.GetWriteCmndMsg(iValue);
+            //sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            //SerialComms.sendMessage(new ArrayList(thisMbo.formatWrite((byte)iValue)));
+            SerialComms.sendMessage(lb);
+
         }
 
         public void ReadBitMessage()
@@ -495,6 +642,8 @@ namespace Modbus_Example2
 
             //In this example we're just sending this to address 0 (called Address 1 in vBuilder).
             // **Note: these are offset by -1 from the # you setup in vBuilder.
+            //alReturn.Add((byte)0x00);               // Starting Address Hi
+            //alReturn.Add((byte)0x00);               // Starting Address Lo. 
             alReturn.Add((byte)0x00);               // Starting Address Hi
             alReturn.Add((byte)0x00);               // Starting Address Lo. 
 
@@ -502,7 +651,12 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x00);                // Quantity of Outputs Hi
             alReturn.Add((byte)0x01);               // Quantity of Outputs Lo
 
-            sendMessage(alReturn);
+            //MBBit mbBit = new MBBit((byte)0x01, (byte)0x00, (byte)0x00);
+            var thisMbo = MBLst[0];
+            SerialComms.sendMessage(thisMbo.readCmndMsg);
+            //sendMessage(alReturn);
+            //sendMessage(mbBit.readCmndMsg);
+            //SerialComms.sendMessage(mbBit.readCmndMsg);
         }
         public void Read16BitMessage()
         {
@@ -520,7 +674,25 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x00);                // Quantity of Outputs Hi
             alReturn.Add((byte)0x01);               // Quantity of Outputs Lo
 
-            sendMessage(alReturn);
+            //sendMessage(alReturn);
+            //SerialComms.sendMessage(alReturn);
+
+            var thisMbo = MBLst[2];
+            var plcRequest = new PlcRequest(false, false);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            SerialComms.sendMessage(plcRequest);
+
+
+            //var thisMbo = MBLst[1];
+            //var plcRequest = new PlcRequest(true, false);
+            //plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            //Read32BitMessage(plcRequest);
+
+        }
+
+        private void ReadUInt16_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void write0_Click(object sender, EventArgs e)
@@ -568,12 +740,38 @@ namespace Modbus_Example2
             alReturn.Add((byte)0x00); // Quantity of 16 Bit words to read
             alReturn.Add((byte)0x02); // Quantity of 16 Bit words to read
 
-            sendMessage(alReturn);
+            //sendMessage(alReturn);
+            SerialComms.sendMessage(alReturn);
         }
+        public void Read32BitMessage(PlcRequest plcRequest)
+        {
+            //plcRequest.requestBytes.Add((byte)0x01);
+            //plcRequest.requestBytes.Add((byte)0x04);
 
+            //plcRequest.requestBytes.Add((byte)0x00);
+            //plcRequest.requestBytes.Add((byte)0x00);
+
+            //plcRequest.requestBytes.Add((byte)0x00);
+            //plcRequest.requestBytes.Add((byte)0x02);
+            SerialComms.sendMessage(plcRequest);
+        }
         public void ReadFloatMessage()
         {
-            Read32BitMessage();
+            // On the read we know what we are looking for, signed/unsigned, int/float, need to pass both values
+            // use an object to contain the alReturn and both indicators
+            /*
+             * class plcRequest
+             * {
+             *      ArrayList requestBytes = new ArrayList();
+             *      bool isFloat;
+             *      bool isSigned;
+             * }
+             */
+
+            var thisMbo = MBLst[1];
+            var plcRequest = new PlcRequest(true, false);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            Read32BitMessage(plcRequest);
         }
 
         private void write32value_ValueChanged(object sender, EventArgs e)
@@ -588,7 +786,10 @@ namespace Modbus_Example2
 
         private void read32_Click(object sender, EventArgs e)
         {
-            Read32BitMessage();
+            var thisMbo = MBLst[3];
+            var plcRequest = new PlcRequest(false, true);
+            plcRequest.requestBytes = new List<byte>(thisMbo.readCmndMsg);
+            Read32BitMessage(plcRequest);
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
@@ -614,6 +815,11 @@ namespace Modbus_Example2
         private void readFloat_Click(object sender, EventArgs e)
         {
             ReadFloatMessage();
+        }
+
+        private void read32FloatValue_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
     }

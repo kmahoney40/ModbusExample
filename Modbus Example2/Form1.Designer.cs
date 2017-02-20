@@ -123,7 +123,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(88, 142);
+            this.label7.Location = new System.Drawing.Point(88, 336);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(78, 13);
             this.label7.TabIndex = 6;
@@ -132,7 +132,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(64, 168);
+            this.label8.Location = new System.Drawing.Point(64, 362);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(102, 13);
             this.label8.TabIndex = 7;
@@ -190,7 +190,7 @@
             // 
             // MessageRecieved
             // 
-            this.MessageRecieved.Location = new System.Drawing.Point(169, 165);
+            this.MessageRecieved.Location = new System.Drawing.Point(169, 359);
             this.MessageRecieved.Name = "MessageRecieved";
             this.MessageRecieved.Size = new System.Drawing.Size(344, 20);
             this.MessageRecieved.TabIndex = 13;
@@ -198,7 +198,7 @@
             // 
             // MessageSent
             // 
-            this.MessageSent.Location = new System.Drawing.Point(169, 139);
+            this.MessageSent.Location = new System.Drawing.Point(169, 333);
             this.MessageSent.Name = "MessageSent";
             this.MessageSent.Size = new System.Drawing.Size(344, 20);
             this.MessageSent.TabIndex = 14;
@@ -221,10 +221,15 @@
             // 
             this.write16Value.Location = new System.Drawing.Point(334, 44);
             this.write16Value.Maximum = new decimal(new int[] {
-            65536,
+            32767,
             0,
             0,
             0});
+            this.write16Value.Minimum = new decimal(new int[] {
+            32768,
+            0,
+            0,
+            -2147483648});
             this.write16Value.Name = "write16Value";
             this.write16Value.Size = new System.Drawing.Size(75, 20);
             this.write16Value.TabIndex = 17;
@@ -306,6 +311,11 @@
             0,
             0,
             0});
+            this.writeFloatValue.Minimum = new decimal(new int[] {
+            34000,
+            0,
+            0,
+            -2147483648});
             this.writeFloatValue.Name = "writeFloatValue";
             this.writeFloatValue.Size = new System.Drawing.Size(120, 20);
             this.writeFloatValue.TabIndex = 24;
@@ -363,6 +373,7 @@
             this.read32FloatValue.Name = "read32FloatValue";
             this.read32FloatValue.Size = new System.Drawing.Size(100, 20);
             this.read32FloatValue.TabIndex = 30;
+            this.read32FloatValue.TextChanged += new System.EventHandler(this.read32FloatValue_TextChanged);
             // 
             // label12
             // 
